@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/source"
 )
 
 // CreateMigration creates a migration.
@@ -20,6 +21,30 @@ func CreateMigration(migrationDir string, timestamp int64, name string) (base st
 	}
 
 	return base, nil
+}
+
+func LogUpMigrationPlan(logger LoggerT, driver source.Driver, fromVersion uint, limit int) {
+	step := 0
+	for step < limit || limit < 1 {
+		var (
+			nextVersion uint
+			err         error
+		)
+		if fromVersion == 0 {
+			// nil version
+			nextVersion, err = driver.First()
+		} else {
+			nextVersion, err = driver.Next(fromVersion)
+		}
+		if err != nil {
+			// no more
+			break
+		}
+
+		step = step + 1
+		logger.Infof("step %d: from %d -> %d", step, fromVersion, nextVersion)
+		fromVersion = nextVersion
+	}
 }
 
 // UpMigration applies migrations. If limit is positive, up to limit migrations will be used.

@@ -28,13 +28,27 @@ type MigratorConfig struct {
 	CreateSource func() (string, source.Driver, error)
 }
 
+// MustCreateSource creates a database source from config.
+// It panics on error.
+func (c *MigratorConfig) MustCreateSource() (string, source.Driver) {
+	sourceName, source, err := c.CreateSource()
+	c.abortIfError(err)
+	return sourceName, source
+}
+
+// MustCreateSource creates a database driver from config.
+// It panics on error.
+func (c *MigratorConfig) MustCreateDatabase() (string, database.Driver) {
+	driverName, driver, err := c.CreateDatabase()
+	c.abortIfError(err)
+	return driverName, driver
+}
+
 // MustNewMigrator creates a migrator instance from dsn string.
 // It panics on error.
 func (c *MigratorConfig) MustNewMigrator() *migrate.Migrate {
-	sourceName, source, err := c.CreateSource()
-	c.abortIfError(err)
-	driverName, driver, err := c.CreateDatabase()
-	c.abortIfError(err)
+	sourceName, source := c.MustCreateSource()
+	driverName, driver := c.MustCreateDatabase()
 	migrator, err := migrate.NewWithInstance(
 		sourceName, source,
 		driverName, driver,

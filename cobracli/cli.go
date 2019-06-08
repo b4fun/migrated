@@ -49,7 +49,7 @@ func NewMigrationCommand(
 		},
 	})
 
-	addCommand := &cobra.Command{
+	upCommand := &cobra.Command{
 		Use:   "up",
 		Short: "apply migrations",
 		Run: func(c *cobra.Command, args []string) {
@@ -58,7 +58,16 @@ func NewMigrationCommand(
 				abortWithError(errors.WithStack(err))
 			}
 
-			err = migrated.UpMigration(config.MustNewMigrator(), limit)
+			migrator := config.MustNewMigrator()
+
+			_, sourceDriver := config.MustCreateSource()
+			currentVersion, _, err := migrator.Version()
+			if err != nil && err != migrate.ErrNilVersion {
+				abortWithError(errors.WithStack(err))
+			}
+			migrated.LogUpMigrationPlan(config.Logger, sourceDriver, currentVersion, limit)
+
+			err = migrated.UpMigration(migrator, limit)
 			switch err {
 			case nil:
 			case migrate.ErrNoChange:
@@ -73,14 +82,25 @@ func NewMigrationCommand(
 			logger.Infof("migration(s) applied\n")
 		},
 	}
-	addCommand.Flags().IntP("limit", "n", -1, "apply limit, defaults to apply all")
-	c.AddCommand(addCommand)
+	upCommand.Flags().IntP("limit", "n", -1, "apply limit, defaults to apply all")
+	c.AddCommand(upCommand)
 
 	c.AddCommand(&cobra.Command{
 		Use:   "down",
 		Short: "rollback one migration",
 		Run: func(c *cobra.Command, args []string) {
-			err := migrated.DownMigration(config.MustNewMigrator())
+			migrator := config.MustNewMigrator()
+			currentVersion, _, err := migrator.Version()
+			switch err {
+			case nil:
+				logger.Infof("rollback from %d\n", currentVersion)
+			case migrate.ErrNilVersion:
+				// not things to do
+			default:
+				abortWithError(errors.Wrap(err, "down"))
+			}
+
+			err = migrated.DownMigration(migrator)
 			switch err {
 			case nil:
 			case os.ErrNotExist:
