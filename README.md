@@ -1,10 +1,12 @@
 # migrated
 
+[![GoDoc](https://godoc.org/github.com/b4fun/migrated?status.svg)](https://godoc.org/github.com/b4fun/migrated)
+
 A drop-in database migration helper.
 
-## Usage
+## Usage & Example
 
-TODO, see [example](./example) first.
+See [example](./example) first.
 
 ## LICENSE
 
