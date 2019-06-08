@@ -1,0 +1,36 @@
+version: 2
+jobs:
+  test112:
+    docker:
+      - image: circleci/golang:1.12
+
+    working_directory: /go/src/github.com/b4fun/migrated
+    steps:
+      - checkout
+
+      - run: go get github.com/go-bindata/go-bindata/...
+      - run: go get -v -t -d ./...
+      - run: cd example && make
+      - run: go run example/*.go migration up
+      - run: go run example/*.go migration down
+
+  test111:
+    docker:
+      - image: circleci/golang:1.11
+
+    working_directory: /go/src/github.com/b4fun/migrated
+    steps:
+      - checkout
+
+      - run: go get github.com/go-bindata/go-bindata/...
+      - run: go get -v -t -d ./...
+      - run: cd example && make
+      - run: go run example/*.go migration up
+      - run: go run example/*.go migration down
+
+workflows:
+  version: 2
+  test:
+    jobs:
+      - test111
+      - test112
