@@ -8,3 +8,8 @@ build-bindata:
 	    -pkg=migration \
 	    -ignore=.go \
 	    .
+
+.PHONY: test
+test: build
+	./migrated-cli migration up
+	./migrated-cli migration down

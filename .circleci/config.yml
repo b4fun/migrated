@@ -10,9 +10,7 @@ jobs:
 
       - run: go get github.com/go-bindata/go-bindata/...
       - run: go get -v -t -d ./...
-      - run: cd example && make
-      - run: go run example/*.go migration up
-      - run: go run example/*.go migration down
+      - run: cd example && make test
 
   test113:
     docker:
@@ -24,9 +22,7 @@ jobs:
 
       - run: go get github.com/go-bindata/go-bindata/...
       - run: go get -v -t -d ./...
-      - run: cd example && make
-      - run: go run example/*.go migration up
-      - run: go run example/*.go migration down
+      - run: cd example && make test
 
 workflows:
   version: 2
