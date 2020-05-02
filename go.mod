@@ -1,5 +1,7 @@
 module github.com/b4fun/migrated
 
+go 1.14
+
 require (
 	github.com/golang-migrate/migrate/v4 v4.6.0
 	github.com/pkg/errors v0.8.1

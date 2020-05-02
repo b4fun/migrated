@@ -1,8 +1,8 @@
 version: 2
 jobs:
-  test112:
+  test114:
     docker:
-      - image: circleci/golang:1.12
+      - image: circleci/golang:1.14
 
     working_directory: /go/src/github.com/b4fun/migrated
     steps:
@@ -14,9 +14,9 @@ jobs:
       - run: go run example/*.go migration up
       - run: go run example/*.go migration down
 
-  test111:
+  test113:
     docker:
-      - image: circleci/golang:1.11
+      - image: circleci/golang:1.13
 
     working_directory: /go/src/github.com/b4fun/migrated
     steps:
@@ -32,5 +32,5 @@ workflows:
   version: 2
   test:
     jobs:
-      - test111
-      - test112
+      - test113
+      - test114
